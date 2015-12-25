@@ -1,0 +1,41 @@
+﻿<#@ template language="c#" hostspecific="true" #>
+<#@ output extension=".vstemplate" #>
+<#@ parameter type="System.String" name="Library_C_Version" #>
+<#@ parameter type="System.String" name="Library_D_Version" #>
+<#@ parameter type="System.String" name="Library_E_Version" #>
+<#@ parameter type="System.String" name="Library_F_Version" #><?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData>
+    <Name>Library F Class</Name>
+    <Description>A class from Library F for demonstration purposes.</Description>
+    <Icon>LibraryFItemTemplate.ico</Icon>
+    <TemplateID>7efa8360-0d1b-4287-b02f-902bc655d3b9</TemplateID>
+    <ProjectType>CSharp</ProjectType>
+    <RequiredFrameworkVersion>4.6</RequiredFrameworkVersion>
+    <NumberOfParentCategoriesToRollUp>1</NumberOfParentCategoriesToRollUp>
+    <DefaultName>Class.cs</DefaultName>
+  </TemplateData>
+  <TemplateContent>
+    <References>
+      <Reference>
+        <Assembly>System</Assembly>
+      </Reference>
+    </References>
+    <ProjectItem ReplaceParameters="true">Class.cs</ProjectItem>
+  </TemplateContent>
+  <WizardExtension>
+    <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+    <!-- note: the @repositoryId is the vsix identifier. unlike other nuget usage, all of the referenced packages must
+         be defined in template. the packages must also be included in the vsix itself. this ensures the packages are
+         available when developers create new projects or items and they are working offline. -->
+    <packages repository="extension" repositoryId="Vsix.d2cd5bc8-96a8-4887-b3dc-efd2bc4c8f4f">
+      <package id="LibraryC" version="<#= Library_C_Version #>" />
+      <package id="LibraryD" version="<#= Library_D_Version #>" />
+      <package id="LibraryE" version="<#= Library_E_Version #>" />
+      <package id="LibraryF" version="<#= Library_F_Version #>" />
+    </packages>
+  </WizardData>
+</VSTemplate>

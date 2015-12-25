@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+
+  <UsingTask TaskName="GetPackageMetadata" AssemblyFile="$(MSBuildThisFileName).dll" />
+  <UsingTask TaskName="ResolvePackageReference" AssemblyFile="$(MSBuildThisFileName).dll" />
+
+  <!-- build format for convention-based nuget build properties file -->
+  <PropertyGroup>
+    <NuGetProjectProperties>$(ProjectDir)$(ProjectName).nuget.props</NuGetProjectProperties>
+  </PropertyGroup>
+
+  <!-- import the local project build properties that includes the t4 parameters used to transform the
+       *.nuspec template for pack as well as any build property overrides; if the file exists. these
+       build settings can still be done directly in the source project if desired. this allows a developer
+       to manage nuget build settings without having to unload/reload the source project. -->
+  <Import Project="$(NuGetProjectProperties)" Condition="Exists('$(NuGetProjectProperties)')" />
+
+  <!-- if the required tooling properties haven't been setup, do it now. this is required for the text templating targets -->
+  <PropertyGroup>
+    <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">14.0</VisualStudioVersion>
+    <VSToolsPath Condition=" '$(VSToolsPath)' == '' ">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+
+  <PropertyGroup>
+
+    <!-- define the regex pattern that matches assembly information files; only C# is currently supported.
+         the default matching pattern is any code file that ends with "AssemblyInfo.cs", which is standard.
+         the .net compiler platform (aka Roslyn) will be used to get the attribute values from the semantic
+         model constructed from the matched files -->
+    <AssemblyInfoFilePattern Condition=" '$(AssemblyInfoFilePattern)' == '' ">.*AssemblyInfo.cs</AssemblyInfoFilePattern>
+
+    <!-- indicates whether nuget.exe 'pack' command should be run after the build. this value is always true
+         by default. a project might choose to opt out of packing the project if the target output is not
+         an assembly. for example, the same build features can be used to generate project and item templates. -->
+    <PackAfterBuild Condition=" '$(PackAfterBuild)' == '' ">true</PackAfterBuild>
+
+    <NuGetExe Condition=" '$(NuGetExe)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\NuGet.CommandLine.3.3.0\tools\nuget.exe`))</NuGetExe>
+    <PackageOutDir Condition=" '$(PackageOutDir)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\..`))\NuGet</PackageOutDir>
+    <PackageOutDir>$(PackageOutDir.TrimEnd(`\`))</PackageOutDir>
+    <NuGetPackTarget>$(ProjectPath)</NuGetPackTarget>
+    <NuGetPackProperties Condition=" '$(Configuration)' == '' ">configuration=Release</NuGetPackProperties>
+    <NuGetPackProperties Condition=" '$(Configuration)' != '' ">configuration=$(Configuration)</NuGetPackProperties>
+    <TransformOnBuild>true</TransformOnBuild>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <BeforeTransform>GetSemanticVersionForT4NuSpecTemplate</BeforeTransform>
+  </PropertyGroup>
+
+  <!-- ============================================================================================
+       Delete existing NuGet package for the project being built before the build starts
+       ============================================================================================ -->
+  <Target Name="BeforeBuild" Condition=" $(PackAfterBuild) and Exists('$(PackageOutDir)') ">
+
+    <ItemGroup>
+      <OldNuPkgFile Include="$(PackageOutDir)\$(TargetName)*.nupkg" />
+    </ItemGroup>
+
+    <!-- delete any existing *.nupkg files for the same target output -->
+    <Delete Files="@(OldNuPkgFile)" ContinueOnError="true" />
+
+  </Target>
+
+  <!-- ============================================================================================
+       Resolve the NuGet semantic versions for each user-defind T4 parameter
+       ============================================================================================ -->
+  <Target Name="GetSemanticVersionForT4NuSpecTemplate" Outputs="%(NuPkgSource.Identity)" Condition=" '@(NuPkgSource)' != '' ">
+
+    <!-- executes a task to resolve the nuget semantic for the package generated for the source project -->
+    <ResolvePackageReference SourceProjectPath="%(NuPkgSource.Identity)" AssemblyInfoFilePattern="$(AssemblyInfoFilePattern)">
+      <Output ItemName="_T4ParameterValue" TaskParameter="SemanticVersion" />
+    </ResolvePackageReference>
+
+    <!-- build an item list of T4ParameterValues items as defined by the text templating targets.
+         these parameter names and values are forwarded from msbuild to t4 (*.tt files) during a
+         transform. the parameters are consumed in a template by using the following t4 directive:
+         
+         <#@ parameter type="System.String" name="MyParameter" #>
+    -->
+    <ItemGroup>
+      <T4ParameterValues Include="%(NuPkgSource.T4ParameterName)">
+        <Value>@(_T4ParameterValue)</Value>
+      </T4ParameterValues>
+    </ItemGroup>
+
+  </Target>
+
+  <!-- ============================================================================================
+       Resolve NuGet package metdata and append it to the current pack command properties
+       ============================================================================================ -->
+
+  <!-- only run this target when the pack target is not the source project itself. this is typically
+       when a *.nuspec file is directly specified, which usually occurs for when advanced dependency
+       groups are needed. multiple dependency groups are apparently not supported (or not correctly
+       supported) when running "pack" against a source project -->
+  <Target Name="ReadAndAppendNuGetMetadata" Condition=" '$(NuGetPackTarget)' != '$(ProjectPath)' ">
+
+    <!-- execute task to resolve metadata tokens for *.nuspec file -->
+    <GetPackageMetadata SourceProjectPath="$(ProjectPath)">
+      <Output PropertyName="PackageVersion" TaskParameter="SemanticVersion" />
+      <Output PropertyName="PackageAuthor" TaskParameter="Author" />
+      <Output PropertyName="PackageDescription" TaskParameter="Description" />
+    </GetPackageMetadata>
+
+    <!-- append resolved metadata tokens to current set of properties -->
+    <PropertyGroup>
+      <NuGetPackProperties>id=$(TargetName);version=$(PackageVersion);author=$(PackageAuthor);description=$(PackageDescription);$(NuGetPackProperties)</NuGetPackProperties>
+    </PropertyGroup>
+
+  </Target>
+
+  <!-- ============================================================================================
+       Create the NuGet package after the build
+       ============================================================================================ -->
+  <Target Name="AfterBuild" DependsOnTargets="ReadAndAppendNuGetMetadata" Condition=" $(PackAfterBuild) ">
+
+    <!-- fail if there are parameters to set up for t4, but the text templating targets for t4 are not present -->
+    <Error Condition=" '@(T4Parameter)' != '' and !Exists('$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets') "
+           Text="Modeling SDK for Microsoft Visual Studio is not installed. You can download the current version from: https://www.microsoft.com/en-us/download/details.aspx?id=48148." />
+
+    <!-- fail if there are no parameters to set up for t4 and the specified pack target doesn't exist -->
+    <Error Condition=" '@(T4Parameter)' == '' and !Exists('$(NuGetPackTarget)') "
+           Text="The specified NuGet pack target '$(NuGetPackTarget)' does not exist." />
+
+    <!-- create output folder as necessary -->
+    <MakeDir Condition="!Exists('$(PackageOutDir)')" Directories="$(PackageOutDir)" />
+
+    <!-- create packages -->
+    <Exec Command="&quot;$(NuGetExe)&quot; pack &quot;$(NuGetPackTarget)&quot; -Properties &quot;$(NuGetPackProperties)&quot; -OutputDirectory &quot;$(PackageOutDir)&quot; -NoPackageAnalysis -NonInteractive -Verbosity quiet" />
+
+  </Target>
+
+  <!-- import t4 targets so we can enable transform on build -->
+  <Import Project="$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets" Condition="Exists('$(VSToolsPath)\TextTemplating\Microsoft.TextTemplating.targets')" />
+
+</Project>

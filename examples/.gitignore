@@ -1,0 +1,9 @@
+﻿## Example-specific ignores
+
+# ignore t4 output in the basic example
+/Basic/LibraryB/*.nuspec
+
+# ignore t4 output in the complex example
+/Complex/LibraryD/*.nuspec
+/Complex/LibraryF/*.nuspec
+/Complex/LibraryFItemTemplate/*.vstemplate

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Dictionary>
+ <Words>
+  <Recognized>
+   <Word>Commonsense</Word>
+   <Word>Covariance</Word>
+   <Word>Contravariance</Word>
+   <Word>Dte</Word>
+   <Word>Mvc</Word>
+   <Word>Api</Word>
+  </Recognized>
+  <DiscreteExceptions>
+   <Term>Commonsense</Term>
+   <Term>Dte</Term>
+   <Term>Mvc</Term>
+   <Term>Api</Term>
+  </DiscreteExceptions>
+ </Words>
+ <Acronyms>
+  <CasingExceptions>
+   <Acronym>Dte</Acronym>
+   <Acronym>Mvc</Acronym>
+   <Acronym>Api</Acronym>
+  </CasingExceptions>
+ </Acronyms>
+</Dictionary>
