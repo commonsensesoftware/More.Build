@@ -129,7 +129,7 @@ want to exclude the output of T4 templates, such as \*.nuspec or \*.vstemplate, 
 will change during each build.
 
 ### Examples
-No solution would be complete without examples. The [Examples](https://github.com/commonsensesoftware/More.Build/examples)
+No solution would be complete without examples. The [Examples](https://github.com/commonsensesoftware/More.Build/tree/master/examples)
 folder contains the following examples:
 
 * **Basic** - Provides a basic example where one library has a dependency on another.
