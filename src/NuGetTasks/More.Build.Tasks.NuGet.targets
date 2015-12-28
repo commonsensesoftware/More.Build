@@ -4,22 +4,20 @@
   <UsingTask TaskName="GetPackageMetadata" AssemblyFile="$(MSBuildThisFileName).dll" />
   <UsingTask TaskName="ResolvePackageReference" AssemblyFile="$(MSBuildThisFileName).dll" />
 
-  <!-- build format for convention-based nuget build properties file -->
-  <PropertyGroup>
-    <NuGetProjectProperties>$(ProjectDir)$(ProjectName).nuget.props</NuGetProjectProperties>
-  </PropertyGroup>
-
-  <!-- import the local project build properties that includes the t4 parameters used to transform the
-       *.nuspec template for pack as well as any build property overrides; if the file exists. these
-       build settings can still be done directly in the source project if desired. this allows a developer
-       to manage nuget build settings without having to unload/reload the source project. -->
-  <Import Project="$(NuGetProjectProperties)" Condition="Exists('$(NuGetProjectProperties)')" />
-
   <!-- if the required tooling properties haven't been setup, do it now. this is required for the text templating targets -->
   <PropertyGroup>
     <VisualStudioVersion Condition=" '$(VisualStudioVersion)' == '' ">14.0</VisualStudioVersion>
     <VSToolsPath Condition=" '$(VSToolsPath)' == '' ">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
+
+  <!-- import the local project build properties that includes the t4 parameters used to transform the
+       *.nuspec template for pack as well as any build property overrides; if the file exists. these
+       build settings can still be done directly in the source project if desired. this allows a developer
+       to manage nuget build settings without having to unload/reload the source project.
+       
+       msbuild 14.0 and above automatically imports this file if it exists. this adds backward support for earlier versions -->
+  <Import Project="$(MSBuildProjectDirectory)\$(MSBuildProjectName).nuget.props"
+          Condition=" ( '$(VisualStudioVersion)' == '10.0' OR '$(VisualStudioVersion)' == '11.0' OR '$(VisualStudioVersion)' == '12.0' ) AND Exists('$(MSBuildProjectDirectory)\$(MSBuildProjectName).nuget.props') " />
 
   <PropertyGroup>
 
