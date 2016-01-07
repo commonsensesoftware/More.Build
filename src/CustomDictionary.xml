@@ -8,12 +8,16 @@
    <Word>Dte</Word>
    <Word>Mvc</Word>
    <Word>Api</Word>
+   <Word>Nu</Word>
+   <Word>NuGet</Word>
   </Recognized>
   <DiscreteExceptions>
    <Term>Commonsense</Term>
    <Term>Dte</Term>
    <Term>Mvc</Term>
    <Term>Api</Term>
+   <Term>Nu</Term>
+   <Term>NuGet</Term>
   </DiscreteExceptions>
  </Words>
  <Acronyms>
@@ -21,6 +25,7 @@
    <Acronym>Dte</Acronym>
    <Acronym>Mvc</Acronym>
    <Acronym>Api</Acronym>
+   <Acronym>NuGet</Acronym>
   </CasingExceptions>
  </Acronyms>
 </Dictionary>

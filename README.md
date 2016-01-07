@@ -121,6 +121,13 @@ the most common customizations:
                           will also automatically be updated with the standard tokens
                           **$id$**, **$version$**, **$author$**, and **$description$**,
                           which are normally only provided when building against a project.
+* **Exclude Referenced Projects** - By default, if the target of the _pack_ command is the current
+                                    project, then the **-IncludeReferencedProjects** option is
+                                    automatically specified. The behavior of this switch includes
+                                    dependencies for all referenced projects; however, some of those
+                                    dependencies may be transitive. To override this behavior and
+                                    specify the minimum dependencies yourself, you can specify
+                                    **&lt;ExcludeReferencedProjects&gt;true&lt;/ExcludeReferencedProjects&gt;**.
 
 #### Source Control Notes
 No matter which version control system (VSC) you're using, you'll what to exclude the \*.nupkg

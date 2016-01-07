@@ -1,24 +1,24 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 
-  <PropertyGroup>
-    <!-- since this is a item template, we don't need to create a *.nupkg file after the build -->
-    <PackAfterBuild>false</PackAfterBuild>
-  </PropertyGroup>
-  
-  <ItemGroup>
-    <NuPkgSource Include="..\LibraryC\LibraryC.csproj">
-      <T4ParameterName>Library_C_Version</T4ParameterName>
-    </NuPkgSource>
-    <NuPkgSource Include="..\LibraryD\LibraryD.csproj">
-      <T4ParameterName>Library_D_Version</T4ParameterName>
-    </NuPkgSource>
-    <NuPkgSource Include="..\LibraryE\LibraryE.csproj">
-      <T4ParameterName>Library_E_Version</T4ParameterName>
-    </NuPkgSource>
-    <NuPkgSource Include="..\LibraryF\LibraryF.csproj">
-      <T4ParameterName>Library_F_Version</T4ParameterName>
-    </NuPkgSource>
-  </ItemGroup>
+ <PropertyGroup>
+  <!-- since this is a item template, we don't need to create a *.nupkg file after the build -->
+  <PackAfterBuild>false</PackAfterBuild>
+ </PropertyGroup>
+
+ <ItemGroup>
+  <NuPkgSource Include="..\LibraryC\LibraryC.csproj">
+   <T4ParameterName>Library_C_Version</T4ParameterName>
+  </NuPkgSource>
+  <NuPkgSource Include="..\LibraryD\LibraryD.csproj">
+   <T4ParameterName>Library_D_Version</T4ParameterName>
+  </NuPkgSource>
+  <NuPkgSource Include="..\LibraryE\LibraryE.csproj">
+   <T4ParameterName>Library_E_Version</T4ParameterName>
+  </NuPkgSource>
+  <NuPkgSource Include="..\LibraryF\LibraryF.csproj">
+   <T4ParameterName>Library_F_Version</T4ParameterName>
+  </NuPkgSource>
+ </ItemGroup>
 
 </Project>

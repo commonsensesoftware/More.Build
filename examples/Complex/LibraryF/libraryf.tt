@@ -17,6 +17,8 @@
     <projectUrl>https://github.com/commonsensesoftware/more.build/examples/complex</projectUrl>
     <copyright>Commonsense Software</copyright>
     <dependencies>
+      <!-- NOTE: although we could allow nuget to build the references directly from the project references, 'Library C'
+                 would be added as a direct dependency when it is actually a transitive dependency of 'Library D' -->
       <dependency id="LibraryD" version="<#= Library_D_Version #>" />
       <dependency id="LibraryE" version="<#= Library_E_Version #>" />
     </dependencies>
