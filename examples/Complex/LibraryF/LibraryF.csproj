@@ -67,10 +67,10 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="libraryf.tt">
+    <None Include="libraryf.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>libraryf.nuspec</LastGenOutput>
-    </Content>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\More.Build.Tasks.NuGet.1.0.2\build\dotnet\More.Build.Tasks.NuGet.targets" Condition="Exists('..\packages\More.Build.Tasks.NuGet.1.0.2\build\dotnet\More.Build.Tasks.NuGet.targets')" />
