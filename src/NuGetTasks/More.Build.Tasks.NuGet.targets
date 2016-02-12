@@ -35,7 +35,7 @@
   <NuGetExe Condition=" '$(NuGetExe)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\NuGet.CommandLine.3.3.0\tools\nuget.exe`))</NuGetExe>
   <PackageOutDir Condition=" '$(PackageOutDir)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\..`))\NuGet</PackageOutDir>
   <PackageOutDir>$(PackageOutDir.TrimEnd(`\`))</PackageOutDir>
-  <NuGetPackTarget>$(ProjectPath)</NuGetPackTarget>
+  <NuGetPackTarget Condition=" '$(NuGetPackTarget)' == '' ">$(ProjectPath)</NuGetPackTarget>
   <NuGetPackProperties Condition=" '$(Configuration)' == '' ">configuration=Release</NuGetPackProperties>
   <NuGetPackProperties Condition=" '$(Configuration)' != '' ">configuration=$(Configuration)</NuGetPackProperties>
 
