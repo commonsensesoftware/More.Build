@@ -130,7 +130,7 @@ the most common customizations:
                                     **&lt;ExcludeReferencedProjects&gt;true&lt;/ExcludeReferencedProjects&gt;**.
 
 #### Source Control Notes
-No matter which version control system (VSC) you're using, you'll what to exclude the \*.nupkg
+No matter which version control system (VSC) you're using, you'll want to exclude the \*.nupkg
 output folder. This is a subdirectory of the solution called "NuGet" by default. You'll also
 want to exclude the output of T4 templates, such as \*.nuspec or \*.vstemplate, since they
 will change during each build.
@@ -148,4 +148,4 @@ folder contains the following examples:
 * This solution currently only supports Visual C#. If there is interest in supporting
   other languages, it will be considered for implementation.
 * T4 templates hosted by MSBuild can only be transformed when you perform a build. This
-  may be counter intuitive to your previous experience using T4 templates.
+  may be counterintuitive to your previous experience using T4 templates.
