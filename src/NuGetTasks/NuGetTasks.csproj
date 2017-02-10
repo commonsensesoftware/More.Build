@@ -230,7 +230,7 @@
   <Target Name="AfterBuild">
     <MakeDir Condition="!Exists('..\NuGet')" Directories="..\NuGet" />
     <PropertyGroup>
-      <NuGetExe>..\packages\NuGet.CommandLine.3.3.0\tools\nuget.exe</NuGetExe>
+      <NuGetExe>..\packages\NuGet.CommandLine.3.5.0\tools\nuget.exe</NuGetExe>
       <NuSpec>$(ProjectDir)$(ProjectName).nuspec</NuSpec>
       <NuGetProperties>id=$(TargetName);configuration=$(Configuration)</NuGetProperties>
     </PropertyGroup>

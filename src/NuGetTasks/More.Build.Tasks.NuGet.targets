@@ -31,8 +31,10 @@
          by default. a project might choose to opt out of packing the project if the target output is not
          an assembly. for example, the same build features can be used to generate project and item templates. -->
   <PackAfterBuild Condition=" '$(PackAfterBuild)' == '' ">true</PackAfterBuild>
+  <IncludeSymbols Condition=" '$(IncludeSymbols)' == '' ">false</IncludeSymbols>
+  <Symbols Condition=" '$(IncludeSymbols)' != 'false' ">-Symbols</Symbols>
 
-  <NuGetExe Condition=" '$(NuGetExe)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\NuGet.CommandLine.3.3.0\tools\nuget.exe`))</NuGetExe>
+  <NuGetExe Condition=" '$(NuGetExe)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\NuGet.CommandLine.3.5.0\tools\nuget.exe`))</NuGetExe>
   <PackageOutDir Condition=" '$(PackageOutDir)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\..`))\NuGet</PackageOutDir>
   <PackageOutDir>$(PackageOutDir.TrimEnd(`\`))</PackageOutDir>
   <NuGetPackTarget Condition=" '$(NuGetPackTarget)' == '' ">$(ProjectPath)</NuGetPackTarget>
@@ -129,7 +131,7 @@
   <MakeDir Condition="!Exists('$(PackageOutDir)')" Directories="$(PackageOutDir)" />
 
   <!-- create packages -->
-  <Exec Command="&quot;$(NuGetExe)&quot; pack &quot;$(NuGetPackTarget)&quot; -Properties &quot;$(NuGetPackProperties)&quot; -OutputDirectory &quot;$(PackageOutDir)&quot; $(_IncludeReferencedProjects) -NoPackageAnalysis -NonInteractive -Verbosity quiet" />
+  <Exec Command="&quot;$(NuGetExe)&quot; pack &quot;$(NuGetPackTarget)&quot; -Properties &quot;$(NuGetPackProperties)&quot; -OutputDirectory &quot;$(PackageOutDir)&quot; $(_IncludeReferencedProjects) -NoPackageAnalysis -NonInteractive -Verbosity quiet $(Symbols)" />
 
  </Target>
 
