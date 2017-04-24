@@ -46,7 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <!-- include solution generated packages -->
-    <Content Include="..\NuGet\*.nupkg">
+    <Content Include="..\NuGet\*.nupkg" Exclude="..\NuGet\*symbols.nupkg">
       <Link>Packages\%(FileName)%(Extension)</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

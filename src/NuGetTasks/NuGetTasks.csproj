@@ -186,9 +186,11 @@
       <Link>Properties\SharedAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="AssemblyMetadataTask.cs" />
+    <Compile Include="AttributeDataCollection.cs" />
     <Compile Include="AttributeExtensions.cs" />
     <Compile Include="GlobalSuppressions.cs" />
     <Compile Include="GetPackageMetadata.cs" />
+    <Compile Include="MetadataContext.cs" />
     <Compile Include="ResolvePackageReference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

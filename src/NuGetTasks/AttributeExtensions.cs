@@ -5,10 +5,13 @@
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
     using System.Linq;
+    using System.Reflection;
+    using static System.String;
 
     /// <summary>
     /// Provides extension methods for retrieving attribute information.
     /// </summary>
+    [CLSCompliant( false )]
     public static class AttributeExtensions
     {
         /// <summary>
@@ -17,19 +20,11 @@
         /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of <see cref="AttributeData">attributes</see> to search.</param>
         /// <param name="attributeName">The name of the attribute to find.</param>
         /// <returns>The single value from the attribute's constructor or <c>null</c> if no match is found.</returns>
-        [CLSCompliant( false )]
         public static string GetSingleAttributeValue( this IEnumerable<AttributeData> attributes, string attributeName )
         {
             Contract.Requires( attributes != null );
-            Contract.Requires( !string.IsNullOrEmpty( attributeName ) );
-
-            var attribute = attributes.FirstOrDefault( a => a.AttributeClass.Name == attributeName );
-
-            if ( attribute == null )
-                return null;
-
-            // attribute has exactly one string parameter containing the value
-            return (string) attribute.ConstructorArguments[0].Value;
+            Contract.Requires( !IsNullOrEmpty( attributeName ) );
+            return (string) attributes.FirstOrDefault( a => a.AttributeClass.Name == attributeName )?.ConstructorArguments[0].Value;
         }
 
         /// <summary>
@@ -37,11 +32,10 @@
         /// </summary>
         /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of <see cref="AttributeData">attributes</see> to search.</param>
         /// <returns>The resolved assembly version or <c>null</c>.</returns>
-        [CLSCompliant( false )]
         public static string GetDescription( this IEnumerable<AttributeData> attributes )
         {
             Contract.Requires( attributes != null );
-            return attributes.GetSingleAttributeValue( "AssemblyDescriptionAttribute" );
+            return attributes.GetSingleAttributeValue( nameof( AssemblyDescriptionAttribute ) );
         }
 
         /// <summary>
@@ -53,7 +47,7 @@
         public static string GetCompany( this IEnumerable<AttributeData> attributes )
         {
             Contract.Requires( attributes != null );
-            return attributes.GetSingleAttributeValue( "AssemblyCompanyAttribute" );
+            return attributes.GetSingleAttributeValue( nameof( AssemblyCompanyAttribute ) );
         }
 
         /// <summary>
@@ -61,15 +55,35 @@
         /// </summary>
         /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of <see cref="AttributeData">attributes</see> to search.</param>
         /// <returns>The resolved semantic version or <c>null</c>.</returns>
-        [CLSCompliant( false )]
         public static string GetSemanticVersion( this IEnumerable<AttributeData> attributes )
         {
             Contract.Requires( attributes != null );
 
-            var version = attributes.GetSingleAttributeValue( "AssemblyInformationalVersionAttribute" );
+            var version = attributes.GetSingleAttributeValue( nameof( AssemblyInformationalVersionAttribute ) );
 
-            if ( string.IsNullOrEmpty( version ) )
-                version = attributes.GetSingleAttributeValue( "AssemblyVersionAttribute" );
+            if ( IsNullOrEmpty( version ) )
+            {
+                version = attributes.GetAssemblyVersion();
+            }
+
+            return version;
+        }
+
+        /// <summary>
+        /// Returns the assembly version from the set of attributes.
+        /// </summary>
+        /// <param name="attributes">The <see cref="IEnumerable{T}">sequence</see> of <see cref="AttributeData">attributes</see> to search.</param>
+        /// <returns>The resolved assembly version or "0.0.0.0".</returns>
+        public static string GetAssemblyVersion( this IEnumerable<AttributeData> attributes )
+        {
+            Contract.Requires( attributes != null );
+
+            var version = attributes.GetSingleAttributeValue( nameof( AssemblyVersionAttribute ) );
+
+            if ( IsNullOrEmpty( version ) )
+            {
+                version = "0.0.0.0";
+            }
 
             return version;
         }

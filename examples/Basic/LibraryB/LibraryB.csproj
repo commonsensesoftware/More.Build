@@ -46,30 +46,27 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="libraryb.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>libraryb.nuspec</LastGenOutput>
-    </None>
-    <None Include="libraryb.nuget.props">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="libraryb.nuspec">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>libraryb.tt</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\LibraryA\LibraryA.csproj">
+      <Project>{dbf20cae-bc60-4acc-a88a-499670429331}</Project>
+      <Name>LibraryA</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\More.Build.Tasks.NuGet.1.0.4\build\dotnet\More.Build.Tasks.NuGet.targets" Condition="Exists('..\packages\More.Build.Tasks.NuGet.1.0.4\build\dotnet\More.Build.Tasks.NuGet.targets')" />
+  <Import Project="..\packages\More.Build.Tasks.NuGet.2.0.0\build\portable-net45+win+wpa81+wp80+monoandroid+xamarinios+monotouch\More.Build.Tasks.NuGet.targets" Condition="Exists('..\packages\More.Build.Tasks.NuGet.2.0.0\build\portable-net45+win+wpa81+wp80+monoandroid+xamarinios+monotouch\More.Build.Tasks.NuGet.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\More.Build.Tasks.NuGet.1.0.4\build\dotnet\More.Build.Tasks.NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\More.Build.Tasks.NuGet.1.0.4\build\dotnet\More.Build.Tasks.NuGet.targets'))" />
+    <Error Condition="!Exists('..\packages\More.Build.Tasks.NuGet.2.0.0\build\portable-net45+win+wpa81+wp80+monoandroid+xamarinios+monotouch\More.Build.Tasks.NuGet.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\More.Build.Tasks.NuGet.2.0.0\build\portable-net45+win+wpa81+wp80+monoandroid+xamarinios+monotouch\More.Build.Tasks.NuGet.targets'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,6 +1,4 @@
-﻿<#@ template language="c#" hostspecific="true" #>
-<#@ output extension=".nuspec" #>
-<#@ parameter type="System.String" name="Library_A_Version" #><?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.5">
     <id>$id$</id>
@@ -16,7 +14,7 @@
     <projectUrl>https://github.com/commonsensesoftware/more.build/examples/basic</projectUrl>
     <copyright>Commonsense Software</copyright>
     <dependencies>
-      <dependency id="LibraryA" version="<#= Library_A_Version #>" />
+      <dependency id="LibraryA" version="$librarya$" />
     </dependencies>
   </metadata>
 </package>

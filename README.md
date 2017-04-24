@@ -13,13 +13,15 @@ generated packages in other resources such as templates.
 ### Design
 The design and build process is as follows:
 
-_Read Source Code → Transform T4 Template → Compile_
+_Read Source Code → Generate Properties for Referenced Projects → NuGet Pack_
+
+_Read Source Code → Generate T4 Template Parameters → Transform T4 Template → Compile_
 
 ### How It Works
 
 #### Step 1
 The first step uses a custom MSBuild task that reads the current NuGet semantic
-version from the source project. It achieves this by:
+version from a referenced project. It achieves this by:
 
  1. Loading the source project and enumerating all **&lt;Compile /&gt;** items. This
     approach is used to capture scenarios such as linked files.
@@ -29,7 +31,17 @@ version from the source project. It achieves this by:
     the source assembly using the NET Compiler Platform (Roslyn).
  4. Enumerating attributes for the semantic version. Honor the **AssemblyInformationalVersionAttribute** 
     first and then fall back to the **AssemblyVersionAttribute** value.
- 5. Set the task output to the resolved semantic version.
+ 5. The following MSBuild 15.0 NuGet properties are honored, when present:
+    * PackageVersion
+    * VersionPrefix
+    * VersionSuffix
+ 6. Set the task output to the resolved semantic version.
+
+MSBuild properties have prescendence. This allows you to build packages without changing code or \*.nuspec files. This is particularly useful for pre-release packages. For example:
+
+`msbuild /p:VersionSuffix=beta1`
+
+In addition, this methodology has close parity with NuGet packages create natively for projects using MSBuild 15.0 and will ease the transition to the new project format.
 
 #### Step 2
 Starting with Visual Studio .NET 2013, MSBuild has improved T4 support that
@@ -38,27 +50,48 @@ the output of the build task in *Step 1*, we can create items that the build
 can forward to a T4 template as follows:
 ```xml
 <ItemGroup>
- <T4ParameterValue Include="MyVersion">
+ <T4ParameterValue Include="Project1">
   <Value>$(NuGetSemanticVersion)</Value>
  </T4ParameterValue>
 </ItemGroup>
 ```
 
 #### Step 3
-Now we can change our \*.nuspec file into a T4 template (\*.tt) that outputs an
-up-to-date \*.nuspec files during each build. An abridged T4 template would look like:
-```t4
-<#@ template language="c#" hostspecific="true" #>
-<#@ output extension=".nuspec" #>
-<#@ parameter type="System.String" name="MyVersion" #><?xml version="1.0"?>
+Now we can simply reference any generated project reference tokens in our \*.nuspec file:
+
+```xml
+<?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
  <metadata>
-  <!-- omitted for brevity -->
+  <!-- omitted -->
   <dependencies>
-   <dependency id="MyPackage" version="<#= MyVersion #>" />
+   <dependency id="LibraryA" version="$librarya$" />
   </dependencies>
  </metadata>
 </package>
+```
+
+When we need to reference a NuGet package outside of a \*.nuspec file, we can change our source file into a T4 template (\*.tt) that outputs an up-to-date file during each build. An abridged T4 template for a Visual Studio template (\*.vstempalte) would look like:
+
+```t4
+<#@ template language="c#" hostspecific="true" #>
+<#@ output extension=".vstemplate" #>
+<#@ parameter type="System.String" name="LibraryA" #><?xml version="1.0" encoding="utf-8"?>
+<VSTemplate Version="3.0.0" Type="Item"
+            xmlns="http://schemas.microsoft.com/developer/vstemplate/2005"
+            xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
+  <TemplateData><!-- ommitted --></TemplateData>
+  <TemplateContent><!-- ommitted --></TemplateContent>
+  <WizardExtension>
+    <Assembly>NuGet.VisualStudio.Interop, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</Assembly>
+    <FullClassName>NuGet.VisualStudio.TemplateWizard</FullClassName>
+  </WizardExtension>
+  <WizardData>
+    <packages repository="extension" repositoryId="My.Qualified.Vsix.Id">
+      <package id="LibraryA" version="<#= LibraryA #>" />
+    </packages>
+  </WizardData>
+</VSTemplate>
 ```
 
 #### Step 4
@@ -76,40 +109,61 @@ in this package that stitches all the pieces together for you. If your project
 doesn't have any other dependent packages in the solution, then you're done. The
 corresponding \*.nupkg will be output on each build.
 
-#### Add Your Own Specific Build Properties
+#### Leveraging Project References
 When you do have dependent projects, the sources that will provide the input semantic
-versions cannot be automatically inferred. In order to specify the source projects
-and the corresponding T4 parameter name, you must specify an item group as follows:
+versions will be automatically inferred from project references. For example:
 ```xml
 <ItemGroup>
- <NuPkgSource Include="..\LibraryA.csproj">
-  <T4ParameterName>Lib_A_Version</T4ParameterName>
- </NuPkgSource>
+ <ProjectReference Include="..\LibraryA.csproj">
+  <Name>LibA</Name>
+ </ProjectReference>
 </ItemGroup>
 ```
-This could be specified directly in the target project, but that would require
-unloading, editing, and reloading the project each time there is a change. As
-an alterative, the provided \*.targets file will automatically import your
-custom properties if you add an MSBuild file that follows the naming convention:
-**[project name].nuget.props**. This is the recommended approach to manage
-the NuGet build settings specific to your project.
+
+#### NuGet Pack Properties
+The following rules apply to NuGet pack properties generated from project references:
+
+* If a **&lt;ProjectReference&gt;** has a **&lt;Name&gt;**, that value will be used
+* For **&lt;ProjectReference&gt;** that does not have **&lt;Name&gt;** metadata, the name of the project file is used (without an extension)
+* The resultant token will always be lowercase to have parity with other properties
+* A token name cannot have a `.` character and will be replaced with the `_` character
+
+**Examples**
+* Project1.csproj -> \$project1\$
+* Other.Project.csproj -> \$other_project\$
+
+#### T4 Text Templating Parameters
+The following rules apply to T4 text templating parameters generated from project references:
+
+* If a **&lt;ProjectReference&gt;** has a **&lt;Name&gt;**, that value will be used
+* For a **&lt;ProjectReference&gt;** that does not have **&lt;Name&gt;** metadata, the name of the project file is used (without an extension)
+* A token name cannot have a `.` character and will be replaced with the `_` character
+
+**Examples**
+* Project1.csproj
+  * Declaration: `<#@ parameter type="System.String" name="Project1" #>`
+  * Reference: `<#= Project1 #>`
+* Other.Project.csproj
+  * Declaration: `<#@ parameter type="System.String" name="Other_Project" #>`
+  * Reference: `<#= Other_Project #>`
 
 #### Customizing the Build
 There a several ways the build can be customized. The following outlines a few of
 the most common customizations:
 
 * **Package Output** - The package output can be changed by setting the
-                       **&lt;PackageOutDir /&gt;** build property. The default location
-                       is a subdirectory called "NuGet" in solution directory.
+                       **&lt;PackageOutDir /&gt;** or **&lt;PackageOutputPath /&gt;** (MSBuild 15.0)
+                       build property. The default location is a subdirectory called "NuGet" in
+                       solution directory.
 * **NuGet.exe** - The NuGet executable is referenced from the dependency on the
                   **NuGet.CommandLine** package. If you prefer some other location, you
                   can override it using the **&lt;NuGetExe /&gt;** build property.
 * **NuGet Properties** - The **&lt;NuGetPackProperties /&gt;** property can be specified to
                          pass additional properties that can be used as replacement tokens
-                         in the \*.nuspec file. By default, only the build property
-                         **&lt;Configuration /&gt;** is passed as an additional property,
-                         which maps to the **$configuration$** token. You should append to
-                         this property's value rather than replace it.
+                         in the \*.nuspec file. By default, only the build properties
+                         **&lt;Configuration /&gt;** and **&lt;Platform /&gt;** are supplied,
+                         which map to the **$configuration$** and **$platform$** tokens respectively.
+                         You should append to this property's value rather than replace it.
 * **NuGet Pack Target** - By default, the target of the _pack_ command is the current
                           project. When you pack a source project, there are some
                           automatic behaviors (ex: references)  that cannot otherwise
@@ -121,13 +175,14 @@ the most common customizations:
                           will also automatically be updated with the standard tokens
                           **$id$**, **$version$**, **$author$**, and **$description$**,
                           which are normally only provided when building against a project.
-* **Exclude Referenced Projects** - By default, if the target of the _pack_ command is the current
-                                    project, then the **-IncludeReferencedProjects** option is
-                                    automatically specified. The behavior of this switch includes
-                                    dependencies for all referenced projects; however, some of those
-                                    dependencies may be transitive. To override this behavior and
-                                    specify the minimum dependencies yourself, you can specify
+* **Exclude Referenced Projects** - The **-IncludeReferencedProjects** option is not
+                                    specified. This avoids scenarios where unnecessary,
+                                    transitive dependencies are included in your packages.
+                                    To override this behavior and let NuGet determine the
+                                    dependencies for you, specify
                                     **&lt;ExcludeReferencedProjects&gt;true&lt;/ExcludeReferencedProjects&gt;**.
+
+Any of these properties can be specified directly in the target project, but that would require unloading, editing, and reloading the project each time there is a change. As an alterative, the provided \*.targets file will automatically import your custom properties if you add an MSBuild file that follows the naming convention: **[project name].nuget.props**. This is the recommended approach to manage the NuGet build settings specific to your project.
 
 #### Source Control Notes
 No matter which version control system (VSC) you're using, you'll want to exclude the \*.nupkg

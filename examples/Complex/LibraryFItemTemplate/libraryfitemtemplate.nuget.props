@@ -6,19 +6,4 @@
   <PackAfterBuild>false</PackAfterBuild>
  </PropertyGroup>
 
- <ItemGroup>
-  <NuPkgSource Include="..\LibraryC\LibraryC.csproj">
-   <T4ParameterName>Library_C_Version</T4ParameterName>
-  </NuPkgSource>
-  <NuPkgSource Include="..\LibraryD\LibraryD.csproj">
-   <T4ParameterName>Library_D_Version</T4ParameterName>
-  </NuPkgSource>
-  <NuPkgSource Include="..\LibraryE\LibraryE.csproj">
-   <T4ParameterName>Library_E_Version</T4ParameterName>
-  </NuPkgSource>
-  <NuPkgSource Include="..\LibraryF\LibraryF.csproj">
-   <T4ParameterName>Library_F_Version</T4ParameterName>
-  </NuPkgSource>
- </ItemGroup>
-
 </Project>

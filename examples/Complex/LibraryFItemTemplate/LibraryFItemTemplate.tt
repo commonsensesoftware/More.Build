@@ -1,9 +1,9 @@
 ﻿<#@ template language="c#" hostspecific="true" #>
 <#@ output extension=".vstemplate" #>
-<#@ parameter type="System.String" name="Library_C_Version" #>
-<#@ parameter type="System.String" name="Library_D_Version" #>
-<#@ parameter type="System.String" name="Library_E_Version" #>
-<#@ parameter type="System.String" name="Library_F_Version" #><?xml version="1.0" encoding="utf-8"?>
+<#@ parameter type="System.String" name="LibraryC" #>
+<#@ parameter type="System.String" name="LibraryD" #>
+<#@ parameter type="System.String" name="LibraryE" #>
+<#@ parameter type="System.String" name="LibraryF" #><?xml version="1.0" encoding="utf-8"?>
 <VSTemplate Version="3.0.0" Type="Item" xmlns="http://schemas.microsoft.com/developer/vstemplate/2005" xmlns:sdk="http://schemas.microsoft.com/developer/vstemplate-sdkextension/2010">
   <TemplateData>
     <Name>Library F Class</Name>
@@ -32,10 +32,10 @@
          be defined in template. the packages must also be included in the vsix itself. this ensures the packages are
          available when developers create new projects or items and they are working offline. -->
     <packages repository="extension" repositoryId="Vsix.d2cd5bc8-96a8-4887-b3dc-efd2bc4c8f4f">
-      <package id="LibraryC" version="<#= Library_C_Version #>" />
-      <package id="LibraryD" version="<#= Library_D_Version #>" />
-      <package id="LibraryE" version="<#= Library_E_Version #>" />
-      <package id="LibraryF" version="<#= Library_F_Version #>" />
+      <package id="LibraryC" version="<#= LibraryC #>" />
+      <package id="LibraryD" version="<#= LibraryD #>" />
+      <package id="LibraryE" version="<#= LibraryE #>" />
+      <package id="LibraryF" version="<#= LibraryF #>" />
     </packages>
   </WizardData>
 </VSTemplate>
