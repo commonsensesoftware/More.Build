@@ -19,6 +19,10 @@
  <Import Project="$(MSBuildProjectDirectory)\$(MSBuildProjectName).nuget.props"
          Condition=" ( '$(VisualStudioVersion)' == '10.0' OR '$(VisualStudioVersion)' == '11.0' OR '$(VisualStudioVersion)' == '12.0' ) AND Exists('$(MSBuildProjectDirectory)\$(MSBuildProjectName).nuget.props') " />
 
+ <ItemGroup>
+  <InstalledNuGetCliPackage Include="$(MSBuildThisFileDirectory)..\..\..\NuGet.CommandLine.*\tools\nuget.exe" />
+ </ItemGroup>
+
  <PropertyGroup>
 
   <!-- define the regex pattern that matches assembly information files; only C# is currently supported.
@@ -35,8 +39,6 @@
   <Symbols Condition=" '$(IncludeSymbols)' != 'false' ">-Symbols</Symbols>
   <NoPackageAnalysis Condition=" '$(NoPackageAnalysis)' != 'false' ">true</NoPackageAnalysis>
   <_NoPackageAnalysis Condition=" '$(NoPackageAnalysis)' == 'true' ">-NoPackageAnalysis</_NoPackageAnalysis>
-
-  <NuGetExe Condition=" '$(NuGetExe)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\NuGet.CommandLine.3.5.0\tools\nuget.exe`))</NuGetExe>
 
   <PackageOutDir Condition=" '$(PackageOutDir)' == '' AND '$(PackageOutputPath)' != '' ">$(PackageOutputPath)</PackageOutDir>
   <PackageOutDir Condition=" '$(PackageOutDir)' == '' ">$([System.IO.Path]::GetFullPath(`$(MSBuildThisFileDirectory)..\..\..\..`))\NuGet</PackageOutDir>
@@ -152,6 +154,9 @@
          Text="The specified NuGet pack target '$(NuGetPackTarget)' does not exist." />
 
   <PropertyGroup>
+
+   <_NuGetExe>@(InstalledNuGetCliPackage->Reverse())</_NuGetExe>
+   <NuGetExe Condition=" '$(NuGetExe)' == '' ">$(_NuGetExe.Split(`;`)[0])</NuGetExe>
 
    <!-- allow metadata properties to be overridden -->
    <_Version Condition=" '$(PackageVersion)' != '' ">-Version $(PackageVersion)</_Version>

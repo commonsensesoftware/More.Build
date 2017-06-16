@@ -2,19 +2,14 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
   <metadata minClientVersion="2.5">
     <id>$id$</id>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <authors>Chris Martinez</authors>
     <owners>Commonsense Software</owners>
     <title>More NuGet Build Tasks</title>
     <description>Microsoft Build tasks used to create NuGet packages and their references.</description>
     <summary>Provides MSBuild tasks for creating NuGet packages (*.nupkg). These tasks also integrate with T4 templates (*.tt) so that you can keep the version numbers of dependent packages in your solution up-to-date during the build process.</summary>
-    <releaseNotes>• Symbols are now produced by default
-• &lt;ProjectReference /&gt; supplants &lt;NuPkgSource /&gt;
-• Project references auto-generate *.nuspec tokens
-• -IncludeReferencedProjects is now disabled by default
-• Honor relevant MSBuild 15.0 NuGet packaging properties
-• Support &lt;PackageVersion /&gt; during build
-• Support &lt;VersionSuffix /&gt; during build</releaseNotes>
+    <releaseNotes>• Fix upgrading nuget.exe (#3)
+• Support "*" in AssemblyVersionAttribute (#5)</releaseNotes>
     <language>en-US</language>
     <requireLicenseAcceptance>true</requireLicenseAcceptance>
     <licenseUrl>https://raw.githubusercontent.com/commonsensesoftware/More.Build/master/LICENSE</licenseUrl>
