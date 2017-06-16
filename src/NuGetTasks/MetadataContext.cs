@@ -4,6 +4,8 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.Contracts;
+    using static System.Reflection.AssemblyName;
+    using static System.IO.File;
     using static System.String;
     using Project = Microsoft.Build.Evaluation.Project;
 
@@ -90,10 +92,30 @@
 
             if ( IsNullOrEmpty( value ) )
             {
-                return Attributes.GetAssemblyVersion();
+                value = Attributes.GetAssemblyVersion();
             }
 
-            return value;
+            return UseStarGeneratedAssemblyVersionIfNecessary( value );
+        }
+
+        string UseStarGeneratedAssemblyVersionIfNecessary( string version )
+        {
+            Contract.Requires( !IsNullOrEmpty( version ) );
+            Contract.Ensures( !IsNullOrEmpty( Contract.Result<string>() ) );
+
+            if ( version.IndexOf( '*' ) < 0 )
+            {
+                return version;
+            }
+
+            var assemblyFile = Project.GetPropertyValue( "TargetPath" );
+
+            if ( !IsNullOrEmpty( assemblyFile ) && Exists( assemblyFile ) )
+            {
+                version = GetAssemblyName( assemblyFile ).Version.ToString();
+            }
+
+            return version;
         }
 
         string ResolveAuthor()
@@ -137,12 +159,12 @@
 
                     if ( IsNullOrEmpty( full ) )
                     {
-                        full = Attributes.GetSemanticVersion();
+                        full = UseStarGeneratedAssemblyVersionIfNecessary( Attributes.GetSemanticVersion() );
                         full = SplitSemanticVersion( full, out prefix, out suffix, suffixOverride );
                     }
                     else
                     {
-                        full = full.Substring( 0, full.LastIndexOf( '.' ) );
+                        full = UseStarGeneratedAssemblyVersionIfNecessary( full );
                         prefix = full;
                         suffix = suffixOverride;
                     }
