@@ -19,7 +19,7 @@
     <copyright>Commonsense Software</copyright>
     <developmentDependency>true</developmentDependency>
     <dependencies>
-      <dependency id="NuGet.CommandLine" version="3.5.0" />
+      <dependency id="NuGet.CommandLine" version="[3.5.0]" />
     </dependencies>
   </metadata>
   <files>
